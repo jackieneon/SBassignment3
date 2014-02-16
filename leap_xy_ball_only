@@ -1,0 +1,82 @@
+//what I want the json sketch to look like and then send to the leap sketch
+
+import ddf.minim.spi.*;
+import ddf.minim.signals.*;
+import ddf.minim.*;
+import ddf.minim.analysis.*;
+import ddf.minim.ugens.*;
+import ddf.minim.effects.*;
+
+import de.voidplus.leapmotion.*;
+
+LeapMotion leap;
+
+Minim minim;
+AudioOutput out;
+Oscillator  osc;
+
+Balance balance;
+
+public void setup() {
+  size(640, 360, P3D);
+  noStroke();
+
+  leap = new LeapMotion(this);  
+
+}
+
+public void draw() {
+  defineLights();
+  background(0);
+
+  // HANDS
+  for (Hand hand : leap.getHands()) {
+
+    hand.draw();
+    int     hand_id          = hand.getId();
+    PVector hand_position    = hand.getPosition();
+    
+      }
+    }
+
+
+public void defineLights() {
+  // Orange point light on the right
+  pointLight(150, 100, 0, // Color
+  200, -150, 0); // Position
+
+  // Blue directional light from the left
+  directionalLight(0, 102, 255, // Color
+  1, 0, 0);    // The x-, y-, z-axis direction
+
+//added to see if the leap will move like the mouse? 
+  for (Hand hand : leap.getHands()) {
+
+    hand.draw();
+    int     hand_id          = hand.getId();
+    PVector hand_position    = hand.getPosition();
+
+    // Yellow spotlight from the front
+    spotLight(255, 255, 109, // Color
+    hand_position.x, hand_position.y, 100, // Position
+    0, -0.05, -0.05, // Direction
+    PI / 1, 1);     // Angle, concentration
+  }
+}
+
+
+void leapOnInit() {
+  // println("Leap Motion Init");
+}
+void leapOnConnect() {
+  // println("Leap Motion Connect");
+}
+void leapOnFrame() {
+  // println("Leap Motion Frame");
+}
+void leapOnDisconnect() {
+  // println("Leap Motion Disconnect");
+}
+void leapOnExit() {
+  // println("Leap Motion Exit");
+}
