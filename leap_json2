@@ -50,8 +50,8 @@ void draw(){
 //  outgoing.setInt("x", int(hand_position.x));
 //  outgoing.setInt("y", int(hand_position.y));
 {
-"x":0'
-"y":0
+"x":hand_position.x,
+"y":hand_position.y
 }
 
   
