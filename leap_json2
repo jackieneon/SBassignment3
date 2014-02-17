@@ -47,8 +47,13 @@ void draw(){
   ellipse(remotePoint.x, remotePoint.y, 0,0);
   
   // build JSON object with an x and a y
-  outgoing.setInt("x", int(hand_position.x));
-  outgoing.setInt("y", int(hand_position.y));
+//  outgoing.setInt("x", int(hand_position.x));
+//  outgoing.setInt("y", int(hand_position.y));
+{
+"x":0'
+"y":0
+}
+
   
   sb.send("p5Point", "point2d", outgoing.toString());  
   }
