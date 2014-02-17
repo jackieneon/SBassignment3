@@ -91,13 +91,6 @@ public void defineLights() {
   directionalLight(0, 102, 255, // Color
   1, 0, 0);    // The x-, y-, z-axis direction
 
-//added to see if the leap will move like the mouse? 
-  for (Hand hand : leap.getHands()) {
-
-    hand.draw();
-    int     hand_id          = hand.getId();
-    PVector hand_position    = hand.getPosition();
-
     // Yellow spotlight from the front
     spotLight(255, 255, 109, // Color
     hand_position.x, hand_position.y, 100, // Position
