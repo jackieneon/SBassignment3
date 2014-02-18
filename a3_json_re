@@ -1,0 +1,120 @@
+//where I want the json info to send to
+
+import spacebrew.*;
+
+import ddf.minim.spi.*;
+import ddf.minim.signals.*;
+import ddf.minim.*;
+import ddf.minim.analysis.*;
+import ddf.minim.ugens.*;
+import ddf.minim.effects.*;
+
+String server= "sandbox.spacebrew.cc";
+String name="P5 Custom Example - Objects_JN_r";
+String description ="";
+
+Spacebrew sb;
+
+JSONObject json;
+
+// point that will be synced over spacebrew
+PVector remotePoint = new PVector(0,0);
+
+Minim minim;
+AudioOutput out;
+Oscillator  osc;
+
+Balance balance;
+
+public void setup() {
+  size(840, 360, P3D);
+  noStroke();
+
+  json = loadJSONObject("data.json");
+//  remotePoint.set(m.getInt("x"), m.getInt("y));
+  remotePoint.x = json.getInt("x");
+  remotePoint.y = json.getInt("y");
+  
+  sb = new Spacebrew( this );
+
+  sb.addSubscribe ("p5Point", "point2d");
+  sb.connect(server, name, description);
+
+  minim = new Minim(this);
+  // out = minim.getLineOut();
+  out = minim.getLineOut(Minim.STEREO, 1024);
+
+  // see the example AudioOutput >> SawWaveSignal for more about this class
+  osc = new SawWave(100, 0.2, out.sampleRate());
+  // see the example Polyphonic >> addSignal for more about this
+  out.addSignal(osc);
+}
+
+public void draw() {
+  defineLights();
+  background(0);
+
+    if ( out.hasControl(Controller.PAN) )
+    {
+      // map the mouse position to the audible range of the gain
+      float val = map(remotePoint.x, 1, width, -1, 1);
+      // if a pan control is not available, this will do nothing
+      out.shiftPan(val, -val, (int(remotePoint .x)));
+    }
+
+
+    if ( out.hasControl(Controller.GAIN) )
+    {
+      // map the mouse position to the audible range of the gain
+      float val = map(remotePoint.y, 0, height, 0, -20);  
+//      remotePoint.set(m.getInt("x"), m.getInt("y"));
+      
+      // if a gain control is not available, this will do nothing
+      out.setGain(val);
+    }
+
+    for (int x = 0; x <= width; x += 60) {
+      for (int y = 0; y <= height-20; y += 10) {
+        pushMatrix();
+        translate(x, y);
+        rotateY(map(remotePoint.x, 0, width, 0, PI));
+        rotateX(map(remotePoint .y, 0, height, 0, PI));
+        box(20);
+        popMatrix();
+      }
+    }
+  }
+
+
+public void defineLights() {
+  // Orange point light on the right
+  pointLight(150, 100, 0, // Color
+  200, -150, 0); // Position
+
+  // Blue directional light from the left
+  directionalLight(0, 102, 255, // Color
+  1, 0, 0);    // The x-, y-, z-axis direction
+
+    // Yellow spotlight from the front
+    spotLight(255, 255, 109, // Color
+    remotePoint.x, remotePoint.y, 100, // Position
+    0, -0.05, -0.05, // Direction
+    PI / 1, 1);     // Angle, concentration
+  }
+
+void stop()
+{
+  // always close Minim audio classes when you are finished with them
+  out.close();
+  minim.stop();
+
+  super.stop();
+}
+
+void onCustomMessage( String name, String type, String value ){
+  if ( type.equals("point2d") ){
+    // parse JSON!
+    JSONObject m = JSONObject.parse( value );
+    remotePoint.set( m.getInt("hand_position.x"), m.getInt("hand_position.y"));
+  }
+}
