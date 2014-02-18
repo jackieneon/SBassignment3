@@ -1,0 +1,81 @@
+//trying to send leap hand pos to other sketch and controle the pan and volume 
+
+import spacebrew.*;
+import de.voidplus.leapmotion.*;
+
+LeapMotion leap;
+
+
+String server= "sandbox.spacebrew.cc";
+String name="P5 Custom Example - Objects_JN";
+String description ="";
+
+Spacebrew sb;
+
+// set up JSON to be sent!
+JSONObject outgoing = new JSONObject();
+
+// point that will be synced over spacebrew
+PVector remotePoint = new PVector(0,0);
+
+void setup(){
+  size(640, 360, P3D);
+  noStroke();
+
+  sb = new Spacebrew( this );
+  sb.addPublish ("p5Point", "point2d", outgoing.toString());
+  sb.addSubscribe ("p5Point", "point2d");
+  sb.connect(server, name, description);
+
+  leap = new LeapMotion(this); 
+
+}
+
+void draw(){
+    background(0);
+
+  // HANDS
+  for (Hand hand : leap.getHands()) {
+
+    hand.draw();
+    int     hand_id          = hand.getId();
+    PVector hand_position    = hand.getPosition();
+      
+  fill(0,100,100);
+  ellipse(hand_position.x, hand_position.y, 20,20);
+  fill(255,100,4);
+  ellipse(remotePoint.x, remotePoint.y, 0,0);
+  
+  // build JSON object with an x and a y
+  outgoing.setInt("x", int(hand_position.x));
+  outgoing.setInt("y", int(hand_position.y));
+  
+  sb.send("p5Point", "point2d", outgoing.toString());  
+  }
+}
+
+void onCustomMessage( String name, String type, String value ){
+  if ( type.equals("point2d") ){
+    // parse JSON!
+    JSONObject m = JSONObject.parse( value );
+    remotePoint.set( m.getInt("x"), m.getInt("y"));
+//    remotePoint.set( m.getInt("hand_position.x"), m.getInt("hand_position.y"));
+  }
+}
+
+
+void leapOnInit() {
+  // println("Leap Motion Init");
+}
+void leapOnConnect() {
+  // println("Leap Motion Connect");
+}
+void leapOnFrame() {
+  // println("Leap Motion Frame");
+}
+void leapOnDisconnect() {
+  // println("Leap Motion Disconnect");
+}
+void leapOnExit() {
+  // println("Leap Motion Exit");
+}
